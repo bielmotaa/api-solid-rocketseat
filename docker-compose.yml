@@ -18,10 +18,10 @@ services:
     environment:
     # variáveis de ambiente (configurações do banco)
     
-      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_USERNAME=user
       # usuário do banco
       
-      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_PASSWORD=userdev
       # senha do banco
       
       - POSTGRESQL_DATABASE=apicenter
