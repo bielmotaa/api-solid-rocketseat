@@ -4,7 +4,7 @@ version: '3.8'
 services:
 # lista de containers que vão rodar
 
-  api-solid-pg:
+  api_banco_center:
   # nome do seu container
   
     image: bitnami/postgresql:latest
@@ -24,5 +24,5 @@ services:
       - POSTGRESQL_PASSWORD=docker
       # senha do banco
       
-      - POSTGRESQL_DATABASE=apisolid
+      - POSTGRESQL_DATABASE=apicenter
       # nome do banco que será criado
