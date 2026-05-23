@@ -1,11 +1,28 @@
 version: '3.8'
+# versão do docker-compose
 
 services:
+# lista de containers que vão rodar
+
   api-solid-pg:
+  # nome do seu container
+  
     image: bitnami/postgresql:latest
+    # qual imagem Docker usar (PostgreSQL da Bitnami)
+    
     ports:
-      - '5432:5432'
+      - '5433:5432'
+    # porta do Windows : porta interna do container
+    # DBeaver/app conecta no 5433, container usa 5432 internamente
+    
     environment:
+    # variáveis de ambiente (configurações do banco)
+    
       - POSTGRESQL_USERNAME=docker
+      # usuário do banco
+      
       - POSTGRESQL_PASSWORD=docker
+      # senha do banco
+      
       - POSTGRESQL_DATABASE=apisolid
+      # nome do banco que será criado
