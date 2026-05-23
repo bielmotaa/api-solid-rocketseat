@@ -15,3 +15,4 @@ prisma.user.create({
 }).catch((error) => { //se deu ruim, vai logar o erro no console
     console.error("Error creating user", error);
 });
+ 
