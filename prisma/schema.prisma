@@ -22,9 +22,61 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid())
-  name  String
-  email String @unique
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now())
+
+  //AO RODAR O  user User @relation... o prisma cria pra mim esse  checkIns CheckIn[]
+  // que significa "esse User possui vários CheckIns"
+  // [] = um User tem VÁRIOS CheckIns (1 para N)
+  // sem [] 1-1
+  checkIns CheckIn[]
 
   @@map("users")
+}
+
+model CheckIn {
+  id           String    @id @default(uuid())
+  created_at   DateTime  @default(now())
+  validates_at DateTime?
+
+  user User @relation(fields: [user_id], references: [id])
+  // "user" = nome do campo virtual (não existe no banco, só no Prisma)
+  // você usa ele para acessar os dados do usuário: checkIn.user.name
+  //
+  // "User" = qual model está sendo referenciado
+  // deve ser exatamente igual ao nome do model lá em cima: "model User"
+  //
+  // @relation = diz ao Prisma como ligar os dois models
+  //
+  // fields: [user_id] = qual campo DESSE model guarda a chave estrangeira
+  // ou seja, o user_id aqui embaixo
+  //
+  // references: [id] = qual campo do model USER está sendo referenciado
+  // o Prisma vai procurar um User cujo "id" seja igual ao "user_id" daqui
+
+  user_id String
+  // "user_id" = a chave estrangeira REAL que existe no banco de dados
+  // guarda o valor do id do usuário dono desse registro
+  // ex: user_id = "abc123" significa que esse checkIn pertence ao User de id "abc123"
+
+  gym    Gym    @relation(fields: [gym_id], references: [id])
+  gym_id String
+
+  @@map("check_ins")
+}
+
+model Gym {
+  id          String  @id @default(uuid())
+  title       String
+  description String?
+  phone       String?
+  latitude    Decimal
+  longitude   Decimal
+
+  checkIns CheckIn[]
+
+  @@map("gyms")
 }
