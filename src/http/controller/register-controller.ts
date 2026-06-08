@@ -3,6 +3,8 @@
 import type { FastifyRequest, FastifyReply } from "fastify"
 import { prisma } from "@/lib/prisma.js"
 import z from "zod"
+import { hash } from "bcryptjs"
+import { REPLServer } from "node:repl"
 
 export async function register (req:FastifyRequest , res:FastifyReply )  {
     const createUserBodySchema = z.object({
@@ -13,11 +15,35 @@ export async function register (req:FastifyRequest , res:FastifyReply )  {
     const {name, email, password} = createUserBodySchema.parse(req.body)
     
     //conectar ao banco de dados, jogando os dados recebidos para minha tabela
+    
+    // criando uma senha criptografada
+    // passo o valor que quero criptografar e o numero de hash gerado
+    // exemplo : $2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+
+    const password_hash = await hash(password, 6)
+
+    // Verificar se o usuario ja possui um email cadastrado
+    // O método findUnique é utilizado para buscar um único registro.
+    // Ele só pode ser utilizado com campos que possuem as anotações
+    // @id ou @unique no schema do Prisma, pois precisa garantir
+    // que apenas um registro será retornado.
+    const userWithSomeEmail = await prisma.user.findUnique({
+        where : {
+            email: email // busco um email igual ja cadastrado no banco
+        }
+    }) 
+
+    // retorno um erro se o email ja existir
+    if(userWithSomeEmail){
+        return res.status(409).send
+    }
+
+
     await prisma.user.create({
         data: {
             name,
             email,
-            password_hash: password,
+            password_hash: password_hash,
         }
     })
 
