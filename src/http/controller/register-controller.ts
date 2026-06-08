@@ -1,10 +1,8 @@
 // Com verbatimModuleSyntax habilitado no TypeScript,
 // tipos precisam ser importados com import type
 import type { FastifyRequest, FastifyReply } from "fastify"
-import { prisma } from "@/lib/prisma.js"
 import z from "zod"
-import { hash } from "bcryptjs"
-import { REPLServer } from "node:repl"
+import { registerUseCase } from "@/use-case/register.js"
 
 export async function register (req:FastifyRequest , res:FastifyReply )  {
     const createUserBodySchema = z.object({
@@ -14,39 +12,26 @@ export async function register (req:FastifyRequest , res:FastifyReply )  {
     })
     const {name, email, password} = createUserBodySchema.parse(req.body)
     
-    //conectar ao banco de dados, jogando os dados recebidos para minha tabela
-    
-    // criando uma senha criptografada
-    // passo o valor que quero criptografar e o numero de hash gerado
-    // exemplo : $2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+     try{
+         // Aqui chamo o caso de uso responsável por executar essa funcionalidade.
+         // A lógica foi separada em um use case para manter o controller mais limpo
+         // e evitar colocar regras de negócio diretamente na camada HTTP.
+         // Também é nesse arquivo que acontece a comunicação com o Prisma
+         // para salvar os dados no banco.
 
-    const password_hash = await hash(password, 6)
+         // Separei essa lógica em um arquivo de use case (ou service),
+         // onde fica a comunicação com o Prisma e a persistência dos dados
+         // no banco, mantendo o controller mais organizado.
 
-    // Verificar se o usuario ja possui um email cadastrado
-    // O método findUnique é utilizado para buscar um único registro.
-    // Ele só pode ser utilizado com campos que possuem as anotações
-    // @id ou @unique no schema do Prisma, pois precisa garantir
-    // que apenas um registro será retornado.
-    const userWithSomeEmail = await prisma.user.findUnique({
-        where : {
-            email: email // busco um email igual ja cadastrado no banco
-        }
-    }) 
-
-    // retorno um erro se o email ja existir
-    if(userWithSomeEmail){
-        return res.status(409).send
-    }
-
-
-    await prisma.user.create({
-        data: {
-            name,
+         //  passo os parametros que ele pede, que eu definir na minha interfece para props
+         await registerUseCase({
             email,
-            password_hash: password_hash,
-        }
-    })
-
+            name,
+            password
+         })
+     }catch (err){
+        return res.status(409).send()
+     }
 
     /*
     return — encerra a função imediatamente após enviar a resposta, evitando que o código continue executando
