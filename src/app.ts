@@ -1,9 +1,10 @@
 import fastify from "fastify";
 import { PrismaClient } from "@prisma/client";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { prisma } from "./lib/prisma.js";
 import { register } from "./http/controller/register-controller.js";
 import { appRouter } from "./http/routes.js";
+import { env } from "./env/index.js";
 
 export const app = fastify();
 
@@ -16,6 +17,25 @@ export const app = fastify();
     todas as rotas que ela define (ex: POST /users)."
 */
 app.register(appRouter)
+
+//formatando erros desconhecidos, sendo tratados diretamento pelo fastify e zod
+// as vezes existe parametros que eu nao uso, posso colocar um _ no lugAR, sinalizando que nao estou usando 
+app.setErrorHandler((error, _, reply) => {
+    if(error instanceof ZodError) {
+        return reply
+         .status(400)
+         .send({message : 'Validation error.', issues: error.format()})
+    }
+
+    if(env.NODE_ENV != 'production'){
+        console.error(error) 
+    }else{
+        // terminar o log com o DataDog,NewRelic
+    }
+
+    //erro realmente desconhecido
+    return reply.status(500).send({message: 'Internal serve error.'})
+})
 
 
 /*
