@@ -4,6 +4,7 @@ import type { FastifyRequest, FastifyReply } from "fastify"
 import z from "zod"
 import { RegisterUseCase } from "@/use-case/register.js"
 import { PrismaUsersRepository } from "@/repositories/prisma-users-repository.js"
+import { UserAlreadyExistsError } from "@/use-case/errors/user-already-exists-error.js"
 
 export async function register (req:FastifyRequest , res:FastifyReply )  {
     const createUserBodySchema = z.object({
@@ -41,7 +42,11 @@ export async function register (req:FastifyRequest , res:FastifyReply )  {
          })
 
      }catch (err){
-        return res.status(409).send()
+        //aqui eu verifico se o erro que retorna o err eh sobre UserAlreadyExistsError
+        if(err instanceof UserAlreadyExistsError){
+            return res.status(409).send()
+        }
+        return res.status(500).send()
      }
 
     /*

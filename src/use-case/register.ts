@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma.js"
+import type { usersRepository } from "@/repositories/users-repository.js"
 import { hash } from "bcryptjs"
+import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js"
 
 interface ResgiterUseCaseRequest {
     name : string
@@ -19,7 +21,7 @@ export class RegisterUseCase {
    // macete, passo esse private antes para informar que ele ja 'e privado esse parametro
    // posso usar public e outros tb
    // isso 'e melhor do que fazer private usersRepository e depois this.usersRepository = usersRepository
-   constructor(private usersRepository: any ){
+   constructor(private usersRepository: usersRepository ){
      
    }
 
@@ -37,17 +39,8 @@ export class RegisterUseCase {
     
         const password_hash = await hash(password, 6)
     
-        // Verificar se o usuario ja possui um email cadastrado
-        // O método findUnique é utilizado para buscar um único registro.
-        // Ele só pode ser utilizado com campos que possuem as anotações
-        // @id ou @unique no schema do Prisma, pois precisa garantir
-        // que apenas um registro será retornado.
-        const userWithSomeEmail = await prisma.user.findUnique({
-            where : {
-                email: email // busco um email igual ja cadastrado no banco
-            }
-        }) 
-    
+       //Vou chamar meu repositorio aqui de busca por email
+        const userWithSomeEmail = await this.usersRepository.findyByEmail(email)
         // retorno um erro se o email ja existir
         if (userWithSomeEmail) {
             // Aqui não estou utilizando diretamente os objetos req e res.
@@ -62,7 +55,7 @@ export class RegisterUseCase {
             // ele não deve manipular respostas HTTP diretamente.
             // Por isso, apenas lançamos o erro e deixamos que a camada
             // superior decida qual status e resposta retornar ao cliente. 
-            throw new Error('E-mail already exists.')
+            throw new UserAlreadyExistsError()
           }
     
           // aqui eu vou chamar meu repositorios, atraves dos construtores 
