@@ -2,6 +2,9 @@ import { prisma } from "@/lib/prisma.js";
 import {Prisma} from "@prisma/client"
 import type { usersRepository } from "./users-repository.js";
 
+//it.only - excuta apenas esse test
+//it.skip - pula esse test
+
 // toda vez que eu crio um novo schema no meu prisma e gero ele
 // ele tb gerar certinho a minha tipagem desse meu schema, logo eu posso
 // reutilizar essa tipagem, apenas chamando import {Prisma} from "@prisma/client"

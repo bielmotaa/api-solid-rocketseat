@@ -7,16 +7,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-/**
- * Para que serve: Sempre que você salvar esse arquivo e rodar
- * o comando npx prisma generate, ele cria um pacote de código
- * personalizado para o seu projeto. É esse gerador que vai te dar o
- * autocompletar inteligente (IntelliSense) no seu editor, permitindo
- * que você digite algo como prisma.user.create() com o código já sabendo
- * exatamente quais campos existem.
- */
+// Para que serve: Sempre que você salvar esse arquivo e rodar
+// o comando npx prisma generate, ele cria um pacote de código
+// personalizado para o seu projeto. É esse gerador que vai te dar o
+// autocompletar inteligente (IntelliSense) no seu editor, permitindo
+// que você digite algo como prisma.user.create() com o código já sabendo
+// exatamente quais campos existem.
 
 // Define de onde vêm os seus dados e qual tipo de banco você está usando.
+// A partir do Prisma 7, a `url` não fica mais aqui: ela é configurada em
+// `prisma.config.ts` (para migrations) e via `adapter` no PrismaClient (runtime).
 datasource db {
   provider = "postgresql"
 }

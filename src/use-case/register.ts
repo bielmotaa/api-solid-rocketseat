@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma.js"
 import type { usersRepository } from "@/repositories/users-repository.js"
 import { hash } from "bcryptjs"
 import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js"
+import type { User } from "@prisma/client"
 
 interface ResgiterUseCaseRequest {
     name : string
@@ -9,6 +9,10 @@ interface ResgiterUseCaseRequest {
     password: string
 }
 
+//crio uma interface pro tipo de retorno dessa funcao
+interface RegisterUseCaseResponse{
+    user: User
+}
 
 //Aqui eu estou usando uns dos conceitos de SOLID
 // D - Dependency Inversion Principle
@@ -21,15 +25,13 @@ export class RegisterUseCase {
    // macete, passo esse private antes para informar que ele ja 'e privado esse parametro
    // posso usar public e outros tb
    // isso 'e melhor do que fazer private usersRepository e depois this.usersRepository = usersRepository
-   constructor(private usersRepository: usersRepository ){
-     
-   }
+   constructor(private usersRepository: usersRepository ){ }
 
  async execute({
         name, 
         email, 
         password
-    }:ResgiterUseCaseRequest){
+    }:ResgiterUseCaseRequest) : Promise <RegisterUseCaseResponse>{
     
         //conectar ao banco de dados, jogando os dados recebidos para minha tabela
         
@@ -94,11 +96,16 @@ export class RegisterUseCase {
           // })
           // e se eu fosse mudar de banco, eu ia ter que mudar em cada caso de uso
           
-          await this.usersRepository.create({
+         const user =  await this.usersRepository.create({
               name,
               email,
               password_hash
            })
+
+        //retornaod o usuario retornando
+         return {
+            user
+         }
     
     }
 }

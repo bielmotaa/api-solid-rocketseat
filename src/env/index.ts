@@ -10,6 +10,7 @@ const envSchema = z.object({
     // coerce é para converter o valor para um numero
     // default é para setar o valor padrao se nao for passado
     PORT: z.coerce.number().default(3333),
+    DATABASE_URL: z.string(),
 })
 
 
