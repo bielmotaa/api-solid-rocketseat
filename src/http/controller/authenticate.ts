@@ -2,9 +2,10 @@
 // tipos precisam ser importados com import type
 import type { FastifyRequest, FastifyReply } from "fastify"
 import z from "zod"
-import { PrismaUsersRepository } from "@/repositories/prisma-users-repository.js"
+import { PrismaUsersRepository } from "@/repositories/prisma/prisma-users-repository.js"
 import { AuthenticateUseCase } from "@/use-case/authenticate.js"
 import { InvalidCredentialsError } from "@/use-case/errors/invalid-credentials-erros.js"
+import { makeAuthenticateUseCase } from "@/use-case/factories/make-authenticate-use-casa.js"
 
 export async function authenticate (req:FastifyRequest , res:FastifyReply )  {
     const authenticateBodySchema = z.object({
@@ -14,9 +15,8 @@ export async function authenticate (req:FastifyRequest , res:FastifyReply )  {
     const {email, password} = authenticateBodySchema.parse(req.body)
     
      try{
-        
-         const usersRepository = new PrismaUsersRepository()
-         const authenticateUseCase = new AuthenticateUseCase(usersRepository)
+        //chamando minha fabrica de factory
+         const authenticateUseCase = makeAuthenticateUseCase()
          await authenticateUseCase.execute({
             email,
             password

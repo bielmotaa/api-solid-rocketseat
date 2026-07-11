@@ -1,9 +1,10 @@
 import { expect, describe, it } from 'vitest'
 import { RegisterUseCase } from './register.js'
-import { PrismaUsersRepository } from '@/repositories/prisma-users-repository.js'
+import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-repository.js'
 import { compare } from 'bcryptjs'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository.js'
 import { UserAlreadyExistsError } from './errors/user-already-exists-error.js'
+import { beforeEach } from 'node:test'
 
 // "test" cria um teste.
 // O primeiro parâmetro é o nome/descrição do teste.
@@ -23,13 +24,21 @@ test('check if it works', () => {
 
 //
 
+let usersRepository: InMemoryUsersRepository
+let sut: RegisterUseCase
+
 describe('Register Use Case', () => {
+   // O beforeEach roda antes de cada teste (it)- roda tudo novo. A função dele aqui 
+   // é garantir que cada teste começa com um banco em memória limpo e um sut novo.
+   beforeEach(() => {
+     usersRepository = new InMemoryUsersRepository()
+     sut = new RegisterUseCase(usersRepository)                                                                       
+   })
 
     it('should be ble to register', async () => {
-        const usersRepository = new InMemoryUsersRepository()
-        const registrerUseCase = new RegisterUseCase(usersRepository)
+       
 
-        const { user } = await registrerUseCase.execute({
+        const { user } = await sut.execute({
             name: 'Gabriel Mota',
             email: 'ga@gmail.com',
             password: '123456', //vai ser transformado em hash
@@ -75,8 +84,8 @@ describe('Register Use Case', () => {
         // aqui eu passo meu banco em memoria, do que o do prisma, e passo pro meu caso de uso, pois assim
         // eu evito usar o banco mesmo que as vezes demora e nao preciso tambem rodar o docker/banco
         // esse banco em memoria eh uma representacao do meu banco de dados, os seus metodos
-        const usersRepository = new InMemoryUsersRepository()
-        const registrerUseCase = new RegisterUseCase(usersRepository)
+        // const usersRepository = new InMemoryUsersRepository()
+        // const registrerUseCase = new RegisterUseCase(usersRepository)
 
 
         // Estou enviando os dados necessários para o caso de uso criar um novo usuário.
@@ -84,7 +93,7 @@ describe('Register Use Case', () => {
         // Após a execução do método execute(), o usuário já terá sido criado
         // e retornado para mim. Faço a desestruturação para acessar diretamente
         // o objeto "user".
-        const { user } = await registrerUseCase.execute({
+        const { user } = await sut.execute({
             name: 'Gabriel Mota',
             email: 'ga@gmail.com',
             password: '123456', //vai ser transformado em hash
@@ -104,15 +113,14 @@ describe('Register Use Case', () => {
     })
 
     it('should not be able to register with same email twice', async () => {
-        const usersRepository = new InMemoryUsersRepository()
-        const registrerUseCase = new RegisterUseCase(usersRepository)
+       
 
         const email = 'mota@gmail.com'
 
         // Primeiro cadastramos um usuário com um determinado e-mail.
         // O "await" é necessário porque o método execute é assíncrono e retorna uma Promise.
         // Aqui estamos simulando um cadastro realizado com sucesso.
-        await registrerUseCase.execute({
+        await sut.execute({
             name: 'Gabriel Mota',
             email: email,
             password: '123456',

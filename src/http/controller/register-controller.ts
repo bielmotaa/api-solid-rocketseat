@@ -2,9 +2,8 @@
 // tipos precisam ser importados com import type
 import type { FastifyRequest, FastifyReply } from "fastify"
 import z from "zod"
-import { RegisterUseCase } from "@/use-case/register.js"
-import { PrismaUsersRepository } from "@/repositories/prisma-users-repository.js"
 import { UserAlreadyExistsError } from "@/use-case/errors/user-already-exists-error.js"
+import { makeRegisterUseCase } from "@/use-case/factories/make-register-use-case.js"
 
 export async function register (req:FastifyRequest , res:FastifyReply )  {
     const createUserBodySchema = z.object({
@@ -30,11 +29,16 @@ export async function register (req:FastifyRequest , res:FastifyReply )  {
          // repository (onde esta sendo feito a comunicao com o meu banco de dados)
         // meu repository tambem eh uma classe que passo
         
-         const usersRepository = new PrismaUsersRepository()
+         // const usersRepository = new PrismaUsersRepository()
          // pego meu objeto da minha classe de repository e passo como parametro
          // para am minha classe (para seu construtor) registerUseCase (meu caso de uso)
-         const registerUseCase = new RegisterUseCase(usersRepository)
+         //const registerUseCase = new RegisterUseCase(usersRepository)
          //chamo o metodo que eu criei dentro do meu caso de uso registerUseCase, onde eu crio no meu banco
+        
+        // vou chemar meu factory onde nele se encontra ja as funcoes a cima : usersRepository e registerUseCase
+        // isso eh bom pra evitar chamar esses dependencias varias vezes
+
+         const registerUseCase = makeRegisterUseCase()
          await registerUseCase.execute({
             email,
             name,

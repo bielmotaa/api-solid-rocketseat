@@ -2,6 +2,7 @@ import type { usersRepository } from "@/repositories/users-repository.js";
 import {User} from  "@prisma/client"
 import { InvalidCredentialsError } from "./errors/invalid-credentials-erros.js";
 import { compare } from "bcryptjs"
+
 //dados de entrada
 interface AuthenticateUseCaseRequest{
     email: string
@@ -28,7 +29,7 @@ export class AuthenticateUseCase{
 
             // 3. Se achou, compara a senha digitada com o hash salvo no banco
         //Variaveis boolean deve sempre escrever elas de forma semantica - coloco o does,is,has (verbos na ideia de sim ou nao) + o nome dela no inicios
-        const doesPasswordMatches = await compare(password, user.password)
+        const doesPasswordMatches = await compare(password, user.password_hash)
 
         if(!doesPasswordMatches){
             throw new InvalidCredentialsError()

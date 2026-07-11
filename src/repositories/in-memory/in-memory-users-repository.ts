@@ -8,6 +8,11 @@ import type { usersRepository } from "../users-repository.js";
 export class InMemoryUsersRepository implements usersRepository {
     public items: User[] = []
 
+    async findyById(id: string): Promise<User | null> {
+        const user = this.items.find(item => item.id === id)
+        return user ?? null
+    }
+
     async findyByEmail(email: string): Promise<User | null> {
         const user = this.items.find(item => item.email == email)
         if(!user){

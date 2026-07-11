@@ -1,18 +1,26 @@
 import { expect, describe, it } from 'vitest'
 import { RegisterUseCase } from './register.js'
-import { PrismaUsersRepository } from '@/repositories/prisma-users-repository.js'
+import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-repository.js'
 import { compare, hash } from 'bcryptjs'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository.js'
 import { UserAlreadyExistsError } from './errors/user-already-exists-error.js'
 import { AuthenticateUseCase } from './authenticate.js'
 import { InvalidCredentialsError } from './errors/invalid-credentials-erros.js'
+import { beforeEach } from 'node:test'
+
+let usersRepository: InMemoryUsersRepository
+let sut: AuthenticateUseCase
 
 describe('Authenticate Use Case', () => {
 
-    it('should be ble to authenticate', async () => {
-        const usersRepository = new InMemoryUsersRepository()
-        const sut = new AuthenticateUseCase(usersRepository)
+    beforeEach(()=>{
+        usersRepository = new InMemoryUsersRepository()
+        sut = new AuthenticateUseCase(usersRepository)
+    })
 
+    it('should be ble to authenticate', async () => {
+   
+         //para criacao eu nao chamo aqui meu caso de uso, apenas crio um benco em memoria para testar mesmo
         //usuario criado - simulando um usuario ja cadastrado no sistema, pra poder testar a authenticacao dele
         await usersRepository.create({
             name: 'Gabriel Mota',
@@ -34,10 +42,7 @@ describe('Authenticate Use Case', () => {
 
     //Tentando authenticar um usuario existente no banco com o email errado
     it('should not be able to authenticate with wrong email', async () => {
-        const usersRepository = new InMemoryUsersRepository()
-        const sut = new AuthenticateUseCase(usersRepository)
-         
-
+    
         expect(() =>
         sut.execute({
             email: 'gag@gmail.com',
@@ -48,10 +53,6 @@ describe('Authenticate Use Case', () => {
 
         //Tentando authenticar um usuario existente no banco com o senha errado
     it('should not be able to authenticate with wrong password', async () => {
-        const usersRepository = new InMemoryUsersRepository()
-        const sut = new AuthenticateUseCase(usersRepository)
-         
-
         expect(() =>
         sut.execute({
             email: 'ga@gmail.com',
