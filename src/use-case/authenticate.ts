@@ -1,5 +1,5 @@
 import type { usersRepository } from "@/repositories/users-repository.js";
-import {User} from  "@prisma/client"
+import type {User} from  "@prisma/client"
 import { InvalidCredentialsError } from "./errors/invalid-credentials-erros.js";
 import { compare } from "bcryptjs"
 
@@ -16,6 +16,7 @@ interface AuthenticateUseCaseResponse{
 
 export class AuthenticateUseCase{
     constructor(
+        // vou precisar acesso nosso banco de dados  repositorio posdendo ser o prisma, inmemory...
         private userRepository: usersRepository,
     ) {}
 
@@ -27,7 +28,7 @@ export class AuthenticateUseCase{
             throw new InvalidCredentialsError()
         }
 
-            // 3. Se achou, compara a senha digitada com o hash salvo no banco
+        // 3. Se achou, compara a senha digitada com o hash salvo no banco
         //Variaveis boolean deve sempre escrever elas de forma semantica - coloco o does,is,has (verbos na ideia de sim ou nao) + o nome dela no inicios
         const doesPasswordMatches = await compare(password, user.password_hash)
 
