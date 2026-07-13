@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { z, ZodError } from "zod";
 import { prisma } from "./lib/prisma.js";
 import { register } from "./http/controller/register-controller.js";
-import { appRouter } from "./http/routes.js";
+import { appRouter } from "./http/routes/routes.js";
 import { env } from "./env/index.js";
 
 export const app = fastify();

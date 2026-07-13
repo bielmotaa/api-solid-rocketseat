@@ -1,10 +1,9 @@
-import { expect, describe, it } from 'vitest'
-import { RegisterUseCase } from './register.js'
+import { expect, describe, it, beforeEach } from 'vitest'
+import { RegisterUseCase } from '../register.js'
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-repository.js'
 import { compare } from 'bcryptjs'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository.js'
-import { UserAlreadyExistsError } from './errors/user-already-exists-error.js'
-import { beforeEach } from 'node:test'
+import { UserAlreadyExistsError } from '../errors/user-already-exists-error.js'
 
 // "test" cria um teste.
 // O primeiro parâmetro é o nome/descrição do teste.
@@ -139,7 +138,7 @@ describe('Register Use Case', () => {
             // Executa novamente o cadastro com o mesmo e-mail.
             // O sistema deve identificar que já existe um usuário
             // cadastrado com esse endereço de e-mail.
-            registrerUseCase.execute({
+            sut.execute({
                 name: 'Gabriel Mota',
                 email: email,
                 password: '123456',

@@ -1,5 +1,6 @@
 import type { Prisma, User } from "@prisma/client";
-import type { usersRepository } from "../users-repository.js";
+import type { usersRepository } from "../interfaces/users-repository.js";
+import { randomUUID } from "node:crypto";
 
 
 // arquivo de test para salvar em memoria e poder assim testar sem depender do banco de dados
@@ -21,9 +22,9 @@ export class InMemoryUsersRepository implements usersRepository {
         return user
     }
 
-    async  create(data: Prisma.UserCreateInput) {
+    async create(data: Prisma.UserCreateInput) {
         const user = {
-            id: 'user-1',
+            id:randomUUID() ,
             name: data.name,
             email: data.email,
             password_hash: data.password_hash,

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma.js";
 import {Prisma, type User} from "@prisma/client"
-import type { usersRepository } from "../users-repository.js";
+import type { usersRepository } from "../interfaces/users-repository.js";
 
 //it.only - excuta apenas esse test
 //it.skip - pula esse test
