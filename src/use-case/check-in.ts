@@ -6,6 +6,8 @@ import type { CheckInRepository } from "@/repositories/interfaces/check-ins-repo
 import type { GymsRepository } from "@/repositories/interfaces/gyms-repository.js";
 import { ResourceNotFoundError } from "./errors/resource-not-found-error.js";
 import { getDistanceBetweenCoordinates } from "@/utils/get-distance-between-coordinates.js";
+import { MaxDistanceError } from "./errors/max-distance-error.js";
+import { MaxNumberOfCheckInsError } from "./errors/max-number-of-check-ins-erros.js";
 
 // vou pegar o id do usuario para verificar o check-in dele
 // vou precisar tb do id da academia para saber qual academia ele ta fazendo o check-in
@@ -60,7 +62,7 @@ export class CheckInUseCase{
        const MAX_DISTANCE_IN_KILOMETERS = 0.1
        //AQUI EU VERIFICO, SE A DISTANCIA FOR MAIOR Q 100M, LANCO O ERRO
        if(distance > MAX_DISTANCE_IN_KILOMETERS){
-        throw new Error()
+        throw new MaxDistanceError()
        }
 
 
@@ -73,7 +75,7 @@ export class CheckInUseCase{
 
         // se ja existe um checkin no mesmo dia eu disparo um erro
         if(checkInOnSameDay){
-            throw new Error()
+            throw new MaxNumberOfCheckInsError()
         }
 
         // criando meu checkIn de acordo com o id da academia e id do usuario

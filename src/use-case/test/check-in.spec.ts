@@ -5,13 +5,15 @@ import { InMemoryCheckInRepository } from '@/repositories/in-memory/in-memory-ch
 import { CheckInUseCase } from '../check-in.js'
 import { InMemoryGymsRepository } from '@/repositories/in-memory/in-memory-gyms-repository.js'
 import { Decimal } from '@prisma/client/runtime/index-browser'
+import { MaxNumberOfCheckInsError } from '../errors/max-number-of-check-ins-erros.js'
+import { MaxDistanceError } from '../errors/max-distance-error.js'
 
 let checkInsRepository: InMemoryCheckInRepository
 let gymsRepository: InMemoryGymsRepository
 let sut: CheckInUseCase
 describe('Check-in Use Case', () => {
 
-    beforeEach(() => {
+    beforeEach(async () => {
         checkInsRepository = new InMemoryCheckInRepository()
         gymsRepository = new InMemoryGymsRepository()
         sut = new CheckInUseCase(checkInsRepository, gymsRepository)
@@ -21,8 +23,8 @@ describe('Check-in Use Case', () => {
         // ela aqui no beforeEach), na criacao no caso de uso eh obrigatorio ter uma academia criada antes
         // no eu gymsRepository inMemory eu tenho la dentro items: Gym[] e vou adcionar
         // uma academia pra poder criar um checkIn
-        gymsRepository.items.push(
-            {
+        /* gymsRepository.items.push(  //aqui eu estou criando direto, pois eu ainda nao tinha o meu caso de uso de gym -= create-gym
+            { 
                 id: 'gym-01',
                 title: 'Tupa Gym',
                 description: '',
@@ -31,7 +33,18 @@ describe('Check-in Use Case', () => {
                 latitude: new Decimal(-3.065507745518361),
                 longitude: new Decimal(-59.98157455502111),
             }
-        )
+        )*/
+
+            await gymsRepository.create({
+                id: 'gym-01',
+                title: 'Tupa Gym',
+                description: '',
+                phone: '',
+                latitude: -3.065507745518361,
+                longitude: -59.98157455502111,
+            })
+
+     
 
         // relogio falso: permite controlar/travar a data em testes que dependem de tempo
         // ex: vi.setSystemTime(new Date(2026, 0, 1, 12, 0, 0)) -> trava o "agora" nessa data
@@ -85,7 +98,7 @@ describe('Check-in Use Case', () => {
                     userLatitude: -3.065507745518361,
                     userLongitude: -59.98157455502111
                 })
-            ).rejects.toBeInstanceOf(Error)
+            ).rejects.toBeInstanceOf(MaxNumberOfCheckInsError)
         }),
 
 
@@ -135,7 +148,7 @@ describe('Check-in Use Case', () => {
                 userLatitude: -3.065507745518361,
                 userLongitude: -59.98157455502111
             }),
-        ).rejects.toBeInstanceOf(Error)
+        ).rejects.toBeInstanceOf(MaxDistanceError)
 
 
     })
