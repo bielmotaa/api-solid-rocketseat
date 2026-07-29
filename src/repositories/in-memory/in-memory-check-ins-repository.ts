@@ -49,6 +49,25 @@ export class InMemoryCheckInRepository implements CheckInRepository {
         return checkOnSameDate
     }
 
+
+    // Retornar os checkIns Do usuario
+    async findManyByUserId(userId: string, page: number){
+        return this.items
+        .filter((item) => item.user_id === userId)
+        // .slice(inicio, fim) -> retorna os itens do indice "inicio" ate o indice "fim" (sem incluir o "fim")
+        //
+        // inicio = (page - 1) * 20  -> quantos itens eu preciso "pular" antes de comecar essa pagina
+        //   page 1 -> (1-1)*20 = 0   (nao pula nada, comeca do 0)
+        //   page 2 -> (2-1)*20 = 20  (pula os 20 primeiros, comeca do indice 20)
+        //   page 3 -> (3-1)*20 = 40  (pula os 40 primeiros, comeca do indice 40)
+        //
+        // fim = page * 20 (o fim de uma pagina = o inicio da proxima)
+        //   page 1 -> fim = 1*20 = 20  -> slice(0, 20)   -> itens do indice 0 ao 19
+        //   page 2 -> fim = 2*20 = 40  -> slice(20, 40)  -> itens do indice 20 ao 39
+        //   page 3 -> fim = 3*20 = 60  -> slice(40, 60)  -> itens do indice 40 ao 59
+        .slice((page - 1) * 20, page * 20)
+    }
+
     async create(data: Prisma.CheckInUncheckedCreateInput) {
         const CheckIn = {
             id: randomUUID(),

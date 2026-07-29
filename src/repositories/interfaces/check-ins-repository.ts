@@ -6,4 +6,6 @@ export interface CheckInRepository{
     create(data : Prisma.CheckInUncheckedCreateInput) : Promise<CheckIn>
     //FUNCAO PARA VERIFICAR SE NAO EXISTE DOIS CHECK-IN NO MESMO DIA DO MESMO USER
     findByUserIdOnDate(userId: string, date: Date) : Promise<CheckIn | null>
+    //buscar todos os checkins de um unico usuario
+    findManyByUserId(userId: string, page: number) : Promise<CheckIn[]>
 }
