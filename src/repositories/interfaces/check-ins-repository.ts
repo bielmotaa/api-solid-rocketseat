@@ -8,4 +8,6 @@ export interface CheckInRepository{
     findByUserIdOnDate(userId: string, date: Date) : Promise<CheckIn | null>
     //buscar todos os checkins de um unico usuario
     findManyByUserId(userId: string, page: number) : Promise<CheckIn[]>
+    //retornar apenas o numero de check-ins do usuario
+    countByUserId(userId: string): Promise<number>
 }

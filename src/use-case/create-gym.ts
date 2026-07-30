@@ -1,6 +1,3 @@
-import type { usersRepository } from "@/repositories/interfaces/users-repository.js"
-import { hash } from "bcryptjs"
-import { UserAlreadyExistsError } from "./errors/user-already-exists-error.js"
 import type { Gym } from "@prisma/client"
 import type { GymsRepository } from "@/repositories/interfaces/gyms-repository.js"
 

@@ -33,10 +33,11 @@ describe('Fetch User Check-in History Use Case', () => {
             page:1
         })
 
-        //Aqui eu espero que essa lista tenha o tamanho (toHaveLength) de  2, ou seja, retorne dois check-ins
+        // Aqui eu espero que essa lista tenha o tamanho (toHaveLength)
+        // de  2, ou seja, retorne dois check-ins (visto que eu criei dois check-ins)
         expect(checkIns).toHaveLength(2)
         expect(checkIns).toEqual([ // eu espero que tenha igual  : toEqual
-            // espero que retorne um objeto igual a gym_id : 'gym-01'
+            // espero que retorne um objeto igual a gym_id : 'gym-01' 
             expect.objectContaining({ gym_id: 'gym-01' }),
             expect.objectContaining({ gym_id: 'gym-02' })
         ])

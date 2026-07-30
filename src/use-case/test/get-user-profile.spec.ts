@@ -1,11 +1,7 @@
 import { expect, describe, it, beforeEach } from 'vitest'
-import { RegisterUseCase } from '../register.js'
-import { PrismaUsersRepository } from '@/repositories/prisma/prisma-users-repository.js'
-import { compare, hash } from 'bcryptjs'
+import { hash } from 'bcryptjs'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository.js'
-import { UserAlreadyExistsError } from '../errors/user-already-exists-error.js'
 import { GetUserProfileUseCase } from '../get-user-profile.js'
-import { InvalidCredentialsError } from '../errors/invalid-credentials-erros.js'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error.js'
 
 let usersRepository: InMemoryUsersRepository

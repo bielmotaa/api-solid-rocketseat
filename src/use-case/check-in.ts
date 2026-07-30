@@ -39,7 +39,7 @@ export class CheckInUseCase{
         userLatitude, //do checkIn
         userLongitude //do checkIn
     }: CheckInUseCaseRequest): Promise<CheckInUseCaseResponse>{
-        // buscando a academia de acordo com o gymId do parametro
+        // buscando a academia de acordo com o gymId do parametro, para saber se ela existe antes de fazer o check-in
        const gym = await this.gymsRepository.findByiD(gymId)
 
        if(!gym){

@@ -34,6 +34,9 @@ model User {
   // sem [] 1-1
   checkIns CheckIn[]
 
+  // @@map("users") = renomeia a TABELA no banco de dados, sem mudar o nome do model no código
+  // aqui o model se chama "User" (padrão do Prisma/JS), mas a tabela no banco vai se chamar "users"
+  // no código você continua usando prisma.user.create(), mas no SQL a tabela é "users"
   @@map("users")
 }
 
