@@ -1,6 +1,8 @@
 import { Prisma, type Gym } from "@prisma/client";
 import type { GymsRepository } from "../interfaces/gyms-repository.js";
 import { randomUUID } from "node:crypto";
+import type { findManyNearbyParams } from "../models/find-many-nearby-model.js";
+import { getDistanceBetweenCoordinates } from "@/utils/get-distance-between-coordinates.js";
 
 export class InMemoryGymsRepository implements GymsRepository {
     public items: Gym[] = []
@@ -11,6 +13,25 @@ export class InMemoryGymsRepository implements GymsRepository {
             return null
         }
         return gym ?? null
+    }
+
+
+    // Retornar as academias proximas do usuario
+    async findManyNearby(params: findManyNearbyParams) {
+        return this.items.filter((item) => {
+            // Vou calcular a distancia de cada academia em relacao ao usuario
+            const distance = getDistanceBetweenCoordinates(
+                // Coordenadas do usuario
+                { latitude: params.latitude, longitude: params.longitude },
+                // Coordenadas das academias
+                {   //como ele ta no prisma ( a tipagem) eu faco a convercao toNumber()
+                    latitude: item.latitude.toNumber(),
+                    longitude: item.longitude.toNumber()
+                }
+            )
+            //RETORNO APENAS AS QUE ESTAO A UMA DISTANCIA MENOR QUE 10
+            return distance <10
+        })
     }
 
     async create(data: Prisma.GymCreateInput) {
