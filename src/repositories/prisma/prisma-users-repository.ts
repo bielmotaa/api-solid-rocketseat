@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma.js";
-import {Prisma, type User} from "@prisma/client"
+import {Prisma} from "@prisma/client"
 import type { usersRepository } from "../interfaces/users-repository.js";
 
 //it.only - excuta apenas esse test
@@ -20,8 +20,14 @@ export class PrismaUsersRepository implements usersRepository {
     // Ele só pode ser utilizado com campos que possuem as anotações
     // @id ou @unique no schema do Prisma, pois precisa garantir
     // que apenas um registro será retornado.
-    findyById(id: string): Promise<User | null> {
-        throw new Error('method not implemented')
+
+    async findyById(id: string) {
+        const user = await prisma.user.findUnique({
+            where : {
+                email: id // busco o user pelo seu id no banco
+            }
+        }) 
+        return user
     }
     
     async findyByEmail(email:string){

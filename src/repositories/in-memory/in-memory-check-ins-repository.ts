@@ -117,7 +117,7 @@ export class InMemoryCheckInRepository implements CheckInRepository {
         if (checkInIndex >= 0) {
             // vou atualizar colocando o novo check (com a data e dados atualizados)
             // na posicao do mesmo checkIn
-            this.items[checkInIndex] = checkIn
+            this.items[checkInIndex] = checkIn 
         }
 
         // caso nao encontre, eu apenas retorno esse checkIn mesmo
