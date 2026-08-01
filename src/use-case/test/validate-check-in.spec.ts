@@ -1,9 +1,10 @@
 // vi = "caixa de ferramentas" de mock do Vitest (tempo, funcoes, modulos, etc)
 // ex: vi.useFakeTimers()/vi.setSystemTime() controlam o tempo, vi.fn() cria funcao falsa
-import { expect, describe, it, beforeEach, afterEach } from 'vitest'
+import { expect, describe, it, beforeEach, afterEach, vi } from 'vitest'
 import { InMemoryCheckInRepository } from '@/repositories/in-memory/in-memory-check-ins-repository.js'
 import { ValidateCheckInUseCase } from '../validate-check-in.js'
 import { ResourceNotFoundError } from '../errors/resource-not-found-error.js'
+import { LateCheckInValidationError } from '../errors/late-check-in-validate-error.js'
 
 let checkInsRepository: InMemoryCheckInRepository
 let sut: ValidateCheckInUseCase
@@ -23,7 +24,7 @@ describe('Validate Check-in Use Case', () => {
         //
         // aqui é so a inicializacao: liga o modo falso, mas nao trava nenhuma data ainda
         // quem trava a data de verdade é o vi.setSystemTime(...) chamado dentro de cada teste
-        // vi.useFakeTimers()
+        vi.useFakeTimers()
     })
 
 
@@ -33,7 +34,7 @@ describe('Validate Check-in Use Case', () => {
     afterEach(() => {
         // ex: antes disso, new Date() podia estar travado em 2026-01-01
         // depois disso, new Date() volta a retornar a data/hora real do sistema
-        //   vi.useRealTimers()
+        vi.useRealTimers()
     })
 
     it('should be ble to validate the check in', async () => {
@@ -56,13 +57,40 @@ describe('Validate Check-in Use Case', () => {
         expect(checkInsRepository.items[0]?.validates_at).toEqual(expect.any(Date))
     }),
 
-    it('should not be ble to validate an inexistent check in', async () => {
-       
-        // aqui eu chamo o metodo passando o id do check-in que nao existe para poder validar e rejeitar
-       await expect(() =>
-         sut.execute({
-            checkInId: 'inexistent-check-in-id'
-         })
-        ).rejects.toBeInstanceOf(ResourceNotFoundError)
+        it('should not be ble to validate an inexistent check in', async () => {
+
+            // aqui eu chamo o metodo passando o id do check-in que nao existe para poder validar e rejeitar
+            await expect(() =>
+                sut.execute({
+                    checkInId: 'inexistent-check-in-id'
+                })
+            ).rejects.toBeInstanceOf(ResourceNotFoundError)
+        })
+
+    it('should not be able to validate the check-in after 20 minutes of its creation', async () => {
+        // definindo uma data fake 
+        vi.setSystemTime(new Date(2023, 0, 1, 13, 40))
+
+        // Criando um check-in
+        // Quando eu crio meu check-in, la no repositorio ele defini a data atual
+        // Como eu definir logo em cima uma data, ele vai passar a usar essa data 
+        const createdCheckIn = await checkInsRepository.create({
+            gym_id: 'gym-01',
+            user_id: 'user-01'
+        })
+
+        // vou agora alterar a data ( a que foi criado logo em cima), passando 20min depois 
+        // para nao ser permitido o check-in
+        // advanceTimersByTime eu defino o quanto eu quero pular no tempo
+        const twentyOneMinutesInMs = 1000 * 60 * 21
+        vi.advanceTimersByTime(twentyOneMinutesInMs)
+
+        // aqui eu chamo o metodo passando o id do check-in para poder validar, maS
+        // como vai passar (nao pode passar de 20min), tem q ser bloqueado
+        await expect(() =>
+            sut.execute({
+                checkInId: createdCheckIn.id
+            })
+        ).rejects.toBeInstanceOf(LateCheckInValidationError)
     })
 })
