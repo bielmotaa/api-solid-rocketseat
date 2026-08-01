@@ -10,4 +10,10 @@ export interface CheckInRepository{
     findManyByUserId(userId: string, page: number) : Promise<CheckIn[]>
     //retornar apenas o numero de check-ins do usuario
     countByUserId(userId: string): Promise<number>
+
+    //validar o check-in, recebe pelo id e devolve o check-in
+    findById(id:string): Promise<CheckIn | null>
+    //vou salvar o check-in atualizado
+    save(checkIn: CheckIn): Promise<CheckIn>
+
 }

@@ -35,7 +35,7 @@ export class InMemoryCheckInRepository implements CheckInRepository {
             // isBefore(endOfTheDay)   -> checkInDate e antes do fim do dia? (ex: 09:15:00 < 23:59:59.999 = true)
             // se as duas forem true, o checkIn aconteceu nesse mesmo dia
             const isOnSameDate =
-            checkInDate.isAfter(startOfTheDay) && checkInDate.isBefore(endOfTheDay)
+                checkInDate.isAfter(startOfTheDay) && checkInDate.isBefore(endOfTheDay)
 
             // aqui eu retorno, se o user_id recebido existe no meu banco e se ja existe um checkIn no mesmo dia
             // se ambas forem vdd, esse retorn retorna V, signicnado que o usuario ja realizou um checkIn no mesmo dia
@@ -51,25 +51,25 @@ export class InMemoryCheckInRepository implements CheckInRepository {
 
 
     // Retornar os checkIns Do usuario
-    async findManyByUserId(userId: string, page: number){
+    async findManyByUserId(userId: string, page: number) {
         return this.items
-        .filter((item) => item.user_id === userId)
-        // .slice(inicio, fim) -> retorna os itens do indice "inicio" ate o indice "fim" (sem incluir o "fim")
-        //
-        // inicio = (page - 1) * 20  -> quantos itens eu preciso "pular" antes de comecar essa pagina
-        //   page 1 -> (1-1)*20 = 0   (nao pula nada, comeca do 0)
-        //   page 2 -> (2-1)*20 = 20  (pula os 20 primeiros, comeca do indice 20)
-        //   page 3 -> (3-1)*20 = 40  (pula os 40 primeiros, comeca do indice 40)
-        //
-        // fim = page * 20 (o fim de uma pagina = o inicio da proxima)
-        //   page 1 -> fim = 1*20 = 20  -> slice(0, 20)   -> itens do indice 0 ao 19
-        //   page 2 -> fim = 2*20 = 40  -> slice(20, 40)  -> itens do indice 20 ao 39
-        //   page 3 -> fim = 3*20 = 60  -> slice(40, 60)  -> itens do indice 40 ao 59
-        .slice((page - 1) * 20, page * 20)
+            .filter((item) => item.user_id === userId)
+            // .slice(inicio, fim) -> retorna os itens do indice "inicio" ate o indice "fim" (sem incluir o "fim")
+            //
+            // inicio = (page - 1) * 20  -> quantos itens eu preciso "pular" antes de comecar essa pagina
+            //   page 1 -> (1-1)*20 = 0   (nao pula nada, comeca do 0)
+            //   page 2 -> (2-1)*20 = 20  (pula os 20 primeiros, comeca do indice 20)
+            //   page 3 -> (3-1)*20 = 40  (pula os 40 primeiros, comeca do indice 40)
+            //
+            // fim = page * 20 (o fim de uma pagina = o inicio da proxima)
+            //   page 1 -> fim = 1*20 = 20  -> slice(0, 20)   -> itens do indice 0 ao 19
+            //   page 2 -> fim = 2*20 = 40  -> slice(20, 40)  -> itens do indice 20 ao 39
+            //   page 3 -> fim = 3*20 = 60  -> slice(40, 60)  -> itens do indice 40 ao 59
+            .slice((page - 1) * 20, page * 20)
     }
 
     //retornando o numero de check-ins do usuario
-    async countByUserId(userId: string){
+    async countByUserId(userId: string) {
         return this.items.filter((item) => item.user_id === userId).length
     }
 
@@ -85,5 +85,43 @@ export class InMemoryCheckInRepository implements CheckInRepository {
         this.items.push(CheckIn)
 
         return CheckIn
+    }
+
+    //validar o check-in
+    async findById(id: string) {
+        // tento buscar o checkIn realizado no banco pelo seu id e retorno esse check-in encontrado
+        const checkIn =
+            this.items
+                .find((item) => item.id === id)
+        if (!checkIn) {
+            return null
+        }
+        return checkIn
+    }
+
+    // vou salvar o check-in que foi atualizado
+    // OBS: aqui em memoria, o findById ja retorna a MESMA referencia do objeto que esta no array,
+    // entao mutar o checkIn (ex: checkIn.validates_at = new Date()) ja reflete em this.items sem precisar chamar save().
+    // isso e uma peculiaridade dessa fake em memoria. no repositorio real (Prisma), o findById busca do banco
+    // e retorna um objeto novo e desconectado - mutar esse objeto em JS nao salva nada no banco.
+    // por isso o save() precisa existir e ser chamado sempre pelo use case, pra funcionar igual nas duas implementacoes.
+    // por causa do prisma
+
+    async save(checkIn: CheckIn) {
+        // 1 - vou procurar o checkin que chega nessa funcao no banco de dados
+        // O findIndex() percorre um array e retorna o 
+        // índice (posição) do primeiro elemento que atende à condição informada.
+        // caso ele nao encontre ele retorna -1
+        const checkInIndex = this.items.findIndex(item => item.id === checkIn.id)
+
+        if (checkInIndex >= 0) {
+            // vou atualizar colocando o novo check (com a data e dados atualizados)
+            // na posicao do mesmo checkIn
+            this.items[checkInIndex] = checkIn
+        }
+
+        // caso nao encontre, eu apenas retorno esse checkIn mesmo
+        return checkIn
+
     }
 }
