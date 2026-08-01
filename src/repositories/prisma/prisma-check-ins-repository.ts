@@ -37,6 +37,11 @@ export class PrismaCheckInsRepository implements CheckInRepository {
         // junto com o startOfTheDay, forma o intervalo (inicio -> fim) do dia inteiro
         const endOfTheDay = dayjs(date).endOf('date')
 
+        // findUnique — só funciona quando você filtra por um campo marcado como @unique ou @id no schema do 
+        // Prisma (ex: id, email). O Prisma garante matematicamente que só pode existir 1 resultado. 
+        // Por isso a assinatura é segura: CheckIn | null.
+
+        
         // findFirst em vez de findUnique porque a condicao de busca nao é um campo único (unique)
         // o findUnique do Prisma só aceita campos marcados como @unique ou @id no schema
         // aqui a busca é por user_id + intervalo de datas (gte/lte), que é uma combinacao qualquer,
