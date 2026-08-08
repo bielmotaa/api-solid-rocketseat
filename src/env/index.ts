@@ -11,6 +11,7 @@ const envSchema = z.object({
     // default é para setar o valor padrao se nao for passado
     PORT: z.coerce.number().default(3333),
     DATABASE_URL: z.string(),
+    JWT_SECRET: z.string(),
 })
 
 

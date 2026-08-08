@@ -5,6 +5,7 @@ import { prisma } from "./lib/prisma.js";
 import { register } from "./http/controller/register-controller.js";
 import { appRouter } from "./http/routes/routes.js";
 import { env } from "./env/index.js";
+import fastifyJwt from "@fastify/jwt";
 
 export const app = fastify();
 
@@ -16,25 +17,36 @@ export const app = fastify();
     Aqui estamos dizendo: "Fastify, execute a função appRouter e registra
     todas as rotas que ela define (ex: POST /users)."
 */
+// configurando o fastify para usar o JWT, 
+// passando a chave secreta 
+// (ninguém pode saber essa chave, ela é secreta)
+// eu crio ela em uma variavel de ambiente, e
+//  pego ela com o env.JWT_SECRET
+
+//com isso metodos jwt estarao disponiveis em minha aplicacao, 
+//nas minhas rotas, nos meus controllers, etc
+app.register(fastifyJwt, {
+    secret: env.JWT_SECRET
+})
 app.register(appRouter)
 
 //formatando erros desconhecidos, sendo tratados diretamento pelo fastify e zod
 // as vezes existe parametros que eu nao uso, posso colocar um _ no lugAR, sinalizando que nao estou usando 
 app.setErrorHandler((error, _, reply) => {
-    if(error instanceof ZodError) {
+    if (error instanceof ZodError) {
         return reply
-         .status(400)
-         .send({message : 'Validation error.', issues: error.format()})
+            .status(400)
+            .send({ message: 'Validation error.', issues: error.format() })
     }
 
-    if(env.NODE_ENV != 'production'){
-        console.error(error) 
-    }else{
+    if (env.NODE_ENV != 'production') {
+        console.error(error)
+    } else {
         // terminar o log com o DataDog,NewRelic
     }
 
     //erro realmente desconhecido
-    return reply.status(500).send({message: 'Internal serve error.'})
+    return reply.status(500).send({ message: 'Internal serve error.' })
 })
 
 
