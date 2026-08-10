@@ -4,11 +4,14 @@ import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
-  migrations: {
+  // INFORMO ONDE ESTÁ O ARQUIVO DE SCHEMA, PARA QUE O PRISMA 
+  // POSSA GERAR OS ARQUIVOS DE MIGRAÇÃO CORRETAMENTE
+  schema: "prisma/schema.prisma", 
+  migrations: { // INFORMO ONDE ESTÃO AS MIGRAÇÕES,
+  //  PARA QUE O PRISMA POSSA GERAR OS ARQUIVOS DE MIGRAÇÃO CORRETAMENTE
     path: "prisma/migrations",
   },
-  datasource: {
+  datasource: { // URL DE CONEXÃO COM O BANCO DE DADOS, PARA QUE O PRISMA POSSA GERAR OS ARQUIVOS DE MIGRAÇÃO CORRETAMENTE
     url: env("DATABASE_URL"),
   },
 });
