@@ -34,8 +34,8 @@ describe("Register Controller (e2e)", () => {
             // a gente está enviando junto, tipo preencher um formulário
             // de cadastro (nome, email e senha).
             .send({
-                name: "John Doe",
-                email: "john.doe@example.com",
+                name: "Mota",
+                email: "mota@example.com",
                 password: "123456"
             });
         // depois que o await termina, "response" guarda tudo que
