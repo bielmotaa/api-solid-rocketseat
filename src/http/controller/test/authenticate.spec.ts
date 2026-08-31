@@ -11,7 +11,7 @@ describe("Authenticate Controller (e2e)", () => {
     })
 
     it("should be able to authenticate", async () => {
-        //criando o usuário para autenticar
+        //criando o usuário antes para poder para autenticar 
         await request(app.server)
             .post("/users")
             .send({

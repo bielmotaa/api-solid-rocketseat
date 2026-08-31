@@ -25,6 +25,10 @@ export const app = fastify();
 
 //com isso metodos jwt estarao disponiveis em minha aplicacao, 
 //nas minhas rotas, nos meus controllers, etc
+
+
+//eu passo o meu fastifyJwt para o meu fastify, para ter acesso 
+// aos metodos do fastifyJwt
 app.register(fastifyJwt, {
     secret: env.JWT_SECRET
 })

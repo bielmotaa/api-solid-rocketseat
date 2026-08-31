@@ -47,7 +47,7 @@ export async function profile(req: FastifyRequest, res: FastifyReply) {
 
 
         const { user } = await getUserProfile.execute({
-            userId: req.user.sub
+            userId: req.user.sub //vai me retornar o ID, que foi oq eu armazenei no token
         })
 
     
