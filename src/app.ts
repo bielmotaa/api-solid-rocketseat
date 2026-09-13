@@ -1,11 +1,9 @@
 import fastify from "fastify";
-import { PrismaClient } from "@prisma/client";
-import { z, ZodError } from "zod";
-import { prisma } from "./lib/prisma.js";
-import { register } from "./http/controller/register-controller.js";
-import { appRouter } from "./http/routes/routes.js";
+import { ZodError } from "zod";
+import { usersRoutes } from "./http/controller/users/routers-users/routes.js";
 import { env } from "./env/index.js";
 import fastifyJwt from "@fastify/jwt";
+import { gymsRoutes } from "./http/controller/gyms/routes-gyms/routes.js";
 
 export const app = fastify();
 
@@ -32,7 +30,9 @@ export const app = fastify();
 app.register(fastifyJwt, {
     secret: env.JWT_SECRET
 })
-app.register(appRouter)
+
+app.register(usersRoutes)
+app.register(gymsRoutes)
 
 //formatando erros desconhecidos, sendo tratados diretamento pelo fastify e zod
 // as vezes existe parametros que eu nao uso, posso colocar um _ no lugAR, sinalizando que nao estou usando 

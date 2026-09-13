@@ -40,6 +40,8 @@ describe("Register Controller (e2e)", () => {
             });
         // depois que o await termina, "response" guarda tudo que
         // a API respondeu: status code, corpo da resposta, headers, etc.
+
+        
         expect(response.statusCode).toEqual(201)
     })
 })
