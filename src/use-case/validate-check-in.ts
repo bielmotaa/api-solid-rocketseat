@@ -30,7 +30,7 @@ export class ValidateCheckInUseCase {
 
         // o diff retorna a diferenca entre duas datas
         // estou tirando a diferenca da data atual com checkIn.created_at 
-        // se eu estou chamando essa data a PARTIR DO MEU ESTE, passa a ser a data 
+        // se eu estou chamando essa data a PARTIR DO MEU dia, passa a ser a data 
         // definida no meu vi.setSystemTime(new Date(2023, 0, 1, 13, 40)) la no teste 
         const distanceInMinutesFramCheckInCreation = dayjs(
             new Date()).diff(

@@ -8,5 +8,7 @@ declare module '@fastify/jwt' {
   export interface FastifyJWT {
     payload: {} // payload é o que eu coloco dentro do token, o primeiro {} antes do sign
     user: { sub: string }
+    // nos meus req de (req:FastifyRequest , res:FastifyReply ) , vou poder acessar
+   // req.user.sub - onde nesse meu sub tem o id do usuario, eu defino isso aqui.
   }
 }

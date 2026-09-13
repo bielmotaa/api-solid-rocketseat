@@ -2,10 +2,14 @@
 // tipos precisam ser importados com import type
 import type { FastifyRequest, FastifyReply } from "fastify"
 import z from "zod"
-import { makeCreateGymUseCase } from "@/use-case/factories/make-create-gym-use-case.js"
+import { makeCheckInUseCase } from "@/use-case/factories/make-check-in-use-case.js"
 
 export async function create (req:FastifyRequest , res:FastifyReply )  {
-    const createGymBodySchema = z.object({
+    const createCheckInParamsSchema = z.object({
+        gymId: z.string().uuid()
+      })
+
+    const createCheckInBodySchema = z.object({
        latitude: z.number().refine(value => {
             return Math.abs(value) <= 90
         }, {
@@ -18,16 +22,17 @@ export async function create (req:FastifyRequest , res:FastifyReply )  {
         }),
         
     })
+    // o params é o :valor na url -- /gyms/:gymId no caso o valor de gymID
+    const {gymId} = createCheckInParamsSchema.parse(req.params)
     const {latitude, longitude} = createCheckInBodySchema.parse(req.body)
     
      try{
-         const createGymUseCase = makeCreateGymUseCase()
-         await createGymUseCase.execute({
-            title,
-            description,
-            phone,
-            latitude,
-            longitude
+         const checkInUseCase = makeCheckInUseCase()
+         await checkInUseCase.execute({
+            gymId,
+            userId: req.user.sub,
+            userLatitude:latitude,
+            userLongitude: longitude
          })
 
          return res.status(201).send()

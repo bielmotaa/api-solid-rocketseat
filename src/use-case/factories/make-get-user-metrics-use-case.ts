@@ -1,12 +1,9 @@
-import { PrismaUsersRepository } from "@/repositories/prisma/prisma-users-repository.js"
-import { GetUserProfileUseCase } from "../get-user-profile.js"
+import { PrismaCheckInsRepository } from "@/repositories/prisma/prisma-check-ins-repository.js"
+import { GetUserMetricsUseCase } from "../get-user-metrics.js"
 
-// faco aqui um factory, ou seja, ao inves deu chamar varias vezes 
-// essas dependicas nos cod, 
-// eu crio essa funcao que ja retorna elas
-export function makeGetUserMetricsUseCase(){
-    const usersRepository = new PrismaUsersRepository()
-    const useCase = new GetUserProfileUseCase(usersRepository)
+export function makeGetUserMetricsUseCase() {
+  const checkInsRepository = new PrismaCheckInsRepository()
+  const useCase = new GetUserMetricsUseCase(checkInsRepository)
 
-    return useCase
+  return useCase
 }

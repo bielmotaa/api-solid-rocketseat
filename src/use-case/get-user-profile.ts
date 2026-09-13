@@ -1,6 +1,4 @@
 import type { usersRepository } from "@/repositories/interfaces/users-repository.js";
-import { InvalidCredentialsError } from "./errors/invalid-credentials-erros.js";
-import { compare } from "bcryptjs"
 import { ResourceNotFoundError } from "./errors/resource-not-found-error.js";
 import type { User } from "@prisma/client";
 

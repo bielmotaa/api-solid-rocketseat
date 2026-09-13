@@ -1,4 +1,3 @@
-import type { CheckIn } from "@prisma/client"
 import type { CheckInRepository } from "@/repositories/interfaces/check-ins-repository.js";
 
 interface GetUserMetricsUseCaseRequest {

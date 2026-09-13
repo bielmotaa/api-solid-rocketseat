@@ -1,13 +1,18 @@
+import { verifyJwt } from '@/http/middlewares/verify-jwt.js'
+import type { FastifyInstance } from 'fastify'
+import { create } from '../controller-check-ins/create.js'
+import { history } from '../controller-check-ins/history.js'
+import { metrics } from '../controller-check-ins/metrics.js'
+import { validate } from '../controller-check-ins/validate.js'
 
-import { verifyJwt } from "@/http/middlewares/verify-jwt.js";
-import type { FastifyInstance } from "fastify";
+export async function checkInsRoutes(app: FastifyInstance) {
+  app.addHook('onRequest', verifyJwt)
 
-export async function checkInsRoutes( app: FastifyInstance){
-    // aqui eu estou adicionando o hook de verificação de 
-    // token em todas as rotas da minha aplicação
-    // ou seja, todas as rotas que eu adicionar aqui,
-    // vai ter o hook de verificação de token
-    // o addHook é um hook do fastify, que é executado antes
-    app.addHook('onRequest', verifyJwt)
+  app.get('/check-ins/history', history)
+  app.get('/check-ins/metrics',metrics)
+
+  //O :gymId é uma parte dinâmica da rota.
+  app.post('/gyms/:gymId/check-ins', create)
+  app.patch('/check-ins/:checkInId/validate', validate)
 
 }

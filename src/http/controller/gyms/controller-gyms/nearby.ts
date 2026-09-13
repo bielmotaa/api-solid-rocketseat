@@ -23,6 +23,7 @@ export async function nearby(req: FastifyRequest, res: FastifyReply) {
         }),
     })
 
+    // aqui eu uso re.query, pois o query é uma busca na url, valores ?lati... na url
     const { latitude, longitude } = nearbyGymsQuerySchema.parse(req.query)
 
     try {
