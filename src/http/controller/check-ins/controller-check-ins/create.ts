@@ -9,6 +9,7 @@ export async function create (req:FastifyRequest , res:FastifyReply )  {
         gymId: z.string().uuid()
       })
 
+    //Lat e long do user
     const createCheckInBodySchema = z.object({
        latitude: z.number().refine(value => {
             return Math.abs(value) <= 90
@@ -23,8 +24,8 @@ export async function create (req:FastifyRequest , res:FastifyReply )  {
         
     })
     // o params é o :valor na url -- /gyms/:gymId no caso o valor de gymID
-    const {gymId} = createCheckInParamsSchema.parse(req.params)
-    const {latitude, longitude} = createCheckInBodySchema.parse(req.body)
+    const {gymId} = createCheckInParamsSchema.parse(req.params) // VALOR Q EU PEGO PELA URL, eu pego o id da academia direto pela rota
+    const {latitude, longitude} = createCheckInBodySchema.parse(req.body) //AQUI OS VALORES Q EU ENVIO PARA A ROTA 
     
      try{
          const checkInUseCase = makeCheckInUseCase()

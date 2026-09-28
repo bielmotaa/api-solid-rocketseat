@@ -11,12 +11,13 @@ import { makeFetchNearbyGymsUseCase } from "@/use-case/factories/make-fetch-near
 // e retorno os gyms próximos dele
 export async function nearby(req: FastifyRequest, res: FastifyReply) {
     const nearbyGymsQuerySchema = z.object({
-        latitude: z.number().refine(value => {
+        //todo paramentro que cgeja, vem como string, com o coerce eu converto ele parra numero
+        latitude: z.coerce.number().refine(value => {
             return Math.abs(value) <= 90
         }, {
             message: 'Latitude must be between -90 and 90'
         }),
-        longitude: z.number().refine(value => {
+        longitude: z.coerce.number().refine(value => {
             return Math.abs(value) <= 180
         }, {
             message: 'Longitude must be between -180 and 180'

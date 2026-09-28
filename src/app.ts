@@ -4,6 +4,7 @@ import { usersRoutes } from "./http/controller/users/routers-users/routes.js";
 import { env } from "./env/index.js";
 import fastifyJwt from "@fastify/jwt";
 import { gymsRoutes } from "./http/controller/gyms/routes-gyms/routes.js";
+import { checkInsRoutes } from "./http/controller/check-ins/routes-check-ins/routes.js";
 
 export const app = fastify();
 
@@ -33,6 +34,7 @@ app.register(fastifyJwt, {
 
 app.register(usersRoutes)
 app.register(gymsRoutes)
+app.register(checkInsRoutes)
 
 //formatando erros desconhecidos, sendo tratados diretamento pelo fastify e zod
 // as vezes existe parametros que eu nao uso, posso colocar um _ no lugAR, sinalizando que nao estou usando 
