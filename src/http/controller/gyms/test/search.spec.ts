@@ -12,7 +12,7 @@ describe("Search Gyms (e2e)", () => {
     })
 
     it("should be able to search for gyms", async () => {
-        const { token } = await createAndAuthenticateUser(app)
+        const { token } = await createAndAuthenticateUser(app, true)
 
         //criando uma academia antes para poder chamar ela
 

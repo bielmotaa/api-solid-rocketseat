@@ -13,7 +13,7 @@ describe("Create Gym (e2e)", () => {
     })
 
     it("should be able to create a gym", async () => {
-        const { token } = await createAndAuthenticateUser(app)
+        const { token } = await createAndAuthenticateUser(app, true)
 
         // Aqui faço uma requisição para a rota "/me", que retorna os dados do perfil do usuário.
         // A requisição precisa do token para que a API saiba quem é o usuário autenticado.
