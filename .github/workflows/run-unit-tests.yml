@@ -31,7 +31,9 @@ jobs:
         # with = configurações dessa ação
         with:
           # qual versão do Node instalar
-          node-version: 18
+          # precisa ser 20.19+, 22.12+ ou 24+ porque o Prisma 7 não funciona em versões mais antigas
+          # uso a 22 para ficar igual à versão que eu tenho no meu computador
+          node-version: 22
           # guarda o cache do npm entre execuções, para não baixar tudo de novo (caso nao tenha mudado nada nas dependencias)
           # toda vez (deixa o workflow mais rápido)
           cache: 'npm'
