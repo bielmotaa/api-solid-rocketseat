@@ -1,0 +1,47 @@
+# este arquivo é um workflow do GitHub Actions: uma receita que o GitHub
+# executa sozinho, num computador dele, toda vez que acontece algo no repositório
+# (aqui: rodar os testes automaticamente para ver se algo quebrou)
+# em YAML
+
+# nome do workflow, é o que aparece na aba "Actions" do GitHub
+name: Run Unit Tests
+
+# QUANDO rodar: [push] = só executar quando eu enviar código (git push) para o repositório
+# dá para colocar outros eventos dentro da lista também, ex: [push, pull_request]
+on: [push]
+
+# lista de tarefas (jobs) que o workflow executa
+jobs:
+  # identificador interno desta tarefa o nome dela
+  run-unit-tests:
+    # nome bonito da tarefa, aparece na tela do GitHub
+    name: Run Unit Tests
+    # em QUAL computador rodar: uma máquina virtual com Linux (Ubuntu) emprestada pelo GitHub
+    runs-on: ubuntu-latest
+
+    # os passos da tarefa, executados em ordem, de cima para baixo
+    steps:
+      # passo 1: baixa o código do meu repositório para dentro da máquina
+      # (a máquina começa vazia, sem nada do meu projeto)
+      # uses = usar uma ação pronta, feita por outra pessoa
+      - uses: actions/checkout@v3
+
+      # passo 2: instala o Node.js na máquina
+      - uses: actions/setup-node@v3
+        # with = configurações dessa ação
+        with:
+          # qual versão do Node instalar
+          node-version: 18
+          # guarda o cache do npm entre execuções, para não baixar tudo de novo (caso nao tenha mudado nada nas dependencias)
+          # toda vez (deixa o workflow mais rápido)
+          cache: 'npm'
+
+      # passo 3: instala as dependências do projeto
+      # run = rodar um comando no terminal da máquina
+      # npm ci é parecido com npm install, mas segue exatamente o package-lock.json
+      # (mais seguro e previsível para automação) e evita ficar fazendo perguntas 
+      - run: npm ci 
+
+      # passo 4: roda os testes (o script "test" do package.json)
+      # se algum teste falhar, o passo falha e o GitHub mostra um ❌ no commit
+      - run: npm run test
