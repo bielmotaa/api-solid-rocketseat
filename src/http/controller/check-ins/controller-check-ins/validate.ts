@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from 'fastify'
+import type { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import { makeValidateCheckInUseCase } from '@/use-case/factories/make-validate-check-in-use-case.js'
 

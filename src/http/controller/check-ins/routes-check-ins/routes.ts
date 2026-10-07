@@ -4,6 +4,7 @@ import { create } from '../controller-check-ins/create.js'
 import { history } from '../controller-check-ins/history.js'
 import { metrics } from '../controller-check-ins/metrics.js'
 import { validate } from '../controller-check-ins/validate.js'
+import { verifyUserRole } from '@/http/middlewares/verify-user-role.js'
 
 export async function checkInsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJwt)
@@ -13,6 +14,6 @@ export async function checkInsRoutes(app: FastifyInstance) {
 
   //O :gymId é uma parte dinâmica da rota.
   app.post('/gyms/:gymId/check-ins', create)
-  app.patch('/check-ins/:checkInId/validate', validate)
+  app.patch('/check-ins/:checkInId/validate',{ onRequest: [verifyUserRole('ADMIN')] }, validate)
 
 }

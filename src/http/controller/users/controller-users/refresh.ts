@@ -8,9 +8,13 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
     // o onlyCookie: true é para procurar o token só no cookie, e não no header
     await request.jwtVerify({ onlyCookie: true })
 
+    const { role } = request.user //pegando a role do user (definida na criacao do token dele)
+
     //apos isso eu crio um novo token para o usuario logado que tiver seu token expirado
     const token = await reply.jwtSign(
-        {},
+        {
+            role: role
+        },
         {
             sign: {
                 sub: request.user.sub,
@@ -22,7 +26,9 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
 
     // crio tambem outro refreshToken para que continue o fluxo 
     const refreshToken = await reply.jwtSign(
-        {},
+        {
+            role: role
+        },
         {
             sign: {
                 sub: request.user.sub,

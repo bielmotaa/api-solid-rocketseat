@@ -56,8 +56,25 @@ export async function authenticate(req: FastifyRequest, res: FastifyReply) {
         // JAMAIS COLOCAR VALORES SENSÍVEIS (como senha) NO TOKEN, porque qualquer um que tiver o 
         // token consegue ver o que tá escrito nele.
 
+        // O PRIMEIRO parâmetro do jwtSign é o PAYLOAD: o que eu escrevo DENTRO do token.
+        // Aqui eu escrevo o role (a função do usuário: ADMIN ou MEMBER).
+        //
+        // Pensa no crachá de um parque:
+        //   - sub: user.id    (no segundo parâmetro) = o DONO do crachá (quem é a pessoa)
+        //   - role: user.role (aqui no payload)      = a FUNÇÃO escrita no crachá (o que ela pode fazer)
+        //
+        // Por que colocar o role no token?
+        // Quando o usuário voltar com o token, o servidor lê o role direto do crachá,
+        // sem precisar ir no banco perguntar. Assim ele já sabe se a pessoa é admin.
+        // Isso permite criar rotas só para admin (ex: criar academia), onde o servidor
+        // olha o role do token e libera ou bloqueia a entrada.
+        //
+        // Lembrete: qualquer um consegue LER o que está escrito no token, então
+        // role é ok (não é segredo), mas senha nunca.
         const token = await res.jwtSign(
-            {},
+            {
+                role: user.role,
+            },
             {
                 sign: {
                     sub: user.id,
@@ -75,7 +92,9 @@ export async function authenticate(req: FastifyRequest, res: FastifyReply) {
         // o refresh token eh usado para renovar o token de acesso
         // ele eh usado quando o token de acesso expira
         const refreshToken = await res.jwtSign(
-            {},
+            {
+                role: user.role,
+            },
             {
                 sign: {
                     sub: user.id,

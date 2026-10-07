@@ -19,8 +19,8 @@ Gympass styles app.
  - [x] O usuario nao pode fazer dois check-in ao mesmo dia 
  - [x] O usuario nao pode fazer check-in se nao estiver perto da academia
  - [x] O check-in so pode ser validado 20min apos criado
- - [] O check-in so pode ser validado por adm
- - [] A academia so pode ser cadastrada por adm
+ - [X] O check-in so pode ser validado por adm
+ - [X] A academia so pode ser cadastrada por adm
 
 ## RNFs
  - [x] A senha do usuario precisa estar criptografada
