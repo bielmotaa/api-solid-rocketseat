@@ -70,10 +70,43 @@ export async function authenticate(req: FastifyRequest, res: FastifyReply) {
         // iss → quem fabricou o crachá (o "emissor")
         // aud → pra quem esse crachá serve (o "público-alvo")
 
-        //caso a pessoa consiga de authentica eu retorno token esse 200
-        return res.status(200).send(
-            { token }
+
+        // criando meu refresh token jwt
+        // o refresh token eh usado para renovar o token de acesso
+        // ele eh usado quando o token de acesso expira
+        const refreshToken = await res.jwtSign(
+            {},
+            {
+                sign: {
+                    sub: user.id,
+                    expiresIn: '7d' // 7 dias de idade do refresh token, apos isso o refresh token expira
+                    //  o usuario precisa fazer login novamente para renovar o token de acesso
+                }
+            }
         )
+
+        //caso a pessoa consiga de authentica eu retorno token esse 200
+        return res
+            // aqui eu estou setando o cookie refreshToken com o refreshToken criado
+            // o primeiro parametro é o nome do cookie, o segundo é o valor do cookie, e o terceiro é um objeto com as propriedades do cookie
+            .setCookie('refreshToken', refreshToken, { // vai me retornar no cookie o refreshToken
+                // o path eh o caminho do cookie, 
+                // aqui eu estou dizendo que o cookie eh valido para todas as rotas
+                path: '/',
+                // o secure eh para indicar que o cookie eh seguro, ou seja, so pode ser acessado por HTTPS
+                secure: true,
+                // o sameSite eh para indicar que o cookie so pode ser acessado pelo mesmo site
+                sameSite: true,
+                // o httpOnly eh para indicar que o cookie so pode ser acessado pelo servidor backend e nao pelo navegador
+                httpOnly: true,
+            })
+            .status(200)
+            .send(
+                {
+                    token, //aqui envio o token de acesso pq ele ixpira mais rapidamente
+                    refreshToken
+                }
+            )
 
     } catch (err) {
         if (err instanceof InvalidCredentialsError) {

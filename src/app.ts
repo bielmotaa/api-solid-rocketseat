@@ -5,6 +5,8 @@ import { env } from "./env/index.js";
 import fastifyJwt from "@fastify/jwt";
 import { gymsRoutes } from "./http/controller/gyms/routes-gyms/routes.js";
 import { checkInsRoutes } from "./http/controller/check-ins/routes-check-ins/routes.js";
+import { sign } from "node:crypto";
+import fastifyCookie from "@fastify/cookie";
 
 export const app = fastify();
 
@@ -29,8 +31,24 @@ export const app = fastify();
 //eu passo o meu fastifyJwt para o meu fastify, para ter acesso 
 // aos metodos do fastifyJwt
 app.register(fastifyJwt, {
-    secret: env.JWT_SECRET
+    secret: env.JWT_SECRET,
+    // o cookie diz ao JWT onde procurar o refresh token
+    // o token normal (access token) dura só 10 minutos, então existe o
+    // refresh token, que serve para pedir um token novo sem pedir a senha de novo
+    cookie: {
+        // nome do cookie onde o refresh token fica guardado
+        // (o jwtVerify({ onlyCookie: true }) procura o token nesse cookie)
+        cookieName: 'refreshToken',
+        // false = o cookie não recebe uma segunda assinatura do @fastify/cookie,
+        // porque o JWT já é assinado com o JWT_SECRET
+        signed: false,
+    },
+    sign:{ // o sing eh usado para assinar o token colocando informacoes dentro do token
+       expiresIn: '10m' // 10 minutos de idade do token - apos isso o token expira
+    }
 })
+
+app.register(fastifyCookie) // para usar cookies na aplicacao
 
 app.register(usersRoutes)
 app.register(gymsRoutes)

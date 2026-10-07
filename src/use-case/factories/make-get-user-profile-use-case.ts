@@ -5,10 +5,10 @@ import { GetUserProfileUseCase } from "../get-user-profile.js"
 // essas dependicas nos cod, 
 // eu crio essa funcao que ja retorna elas
 
-export function makeGetUserProfileUseCase(){
+export function makeGetUserProfileUseCase() {
   const usersRepository = new PrismaUsersRepository()
   const useCase = new GetUserProfileUseCase(usersRepository)
 
 
-    return useCase
+  return useCase
 }

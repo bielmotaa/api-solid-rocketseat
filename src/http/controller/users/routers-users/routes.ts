@@ -5,6 +5,7 @@ import { register } from "../controller-users/register-controller.js";
 import { authenticate } from "../controller-users/authenticate.js";
 import { profile } from "../controller-users/profile.js";
 import { verifyJwt } from "../../../middlewares/verify-jwt.js";
+import { refresh } from "../controller-users/refresh.js";
 
 export async function usersRoutes( app: FastifyInstance){
     // passo meu controller - register (cod limpo), 
@@ -13,6 +14,10 @@ export async function usersRoutes( app: FastifyInstance){
 
     // perta de authentication do usuario
     app.post('/sessions', authenticate)
+
+
+    // rota para renovar o token de acesso
+    app.patch('/token/refresh', refresh)
 
     // ## Rotas que so podem ser acessadas por usuarios autenticados
     // rota para obter o perfil do usuário
