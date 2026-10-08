@@ -47,3 +47,9 @@ jobs:
       # passo 4: roda os testes (o script "test" do package.json)
       # se algum teste falhar, o passo falha e o GitHub mostra um ❌ no commit
       - run: npm run test
+        # env = variáveis de ambiente que existem só durante este passo
+        # ${{ secrets.NOME }} lê o valor guardado no cofre do GitHub (Settings > Secrets and variables > Actions)
+        # assim o valor NÃO aparece neste arquivo e fica escondido (***) nos logs
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
