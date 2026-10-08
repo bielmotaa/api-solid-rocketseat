@@ -39,28 +39,31 @@ jobs:
 
     # services = containers extras que ficam rodando junto com o job (aqui, um banco postgres)
     # os testes e2e precisam de um banco de verdade, e o GitHub não tem um pronto,
-    # então eu peço para ele subir meu docke só para este workflow (nasce no começo e é apagado no fim)
+    # então eu peço para ele subir um container Docker só para este workflow (nasce no começo e é apagado no fim)
     services:
       # nome deste serviço
       postgres:
         # qual imagem Docker usar (o mesmo PostgreSQL da Bitnami do meu docker-compose)
         image: bitnami/postgresql
         # porta da máquina : porta do container
-        # liga a porta 5432 do container na 5432 da máquina, por isso a URL usa localhost:5432
+        # o postgres dentro do container sempre usa a 5432, mas aqui eu abro ele na porta 5433 da máquina
+        # porque o meu secret DATABASE_URL usa localhost:5433 (a mesma porta do meu docker-compose local)
+        # se a porta da URL e a porta daqui não forem iguais, dá o erro P1001 "Can't reach database server"
         ports:
-          - 5432:5432
+          - 5433:5432
         # usuário, senha e nome do banco que o container vai criar ao nascer, lidos do cofre do GitHub
         # (a imagem da Bitnami lê exatamente esses nomes de variável para se configurar)
         # os valores precisam ser IGUAIS aos que estão dentro do secret DATABASE_URL
-        # (formato: postgresql://USUARIO:SENHA@localhost:5432/BANCO?schema=public)
+        # (formato: postgresql://USUARIO:SENHA@localhost:5433/BANCO?schema=public)
         # se não baterem, os testes falham com erro de autenticação ou "database does not exist"
         env:
           POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_USERNAME }}
           POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
           POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE }}
 
-    # os passos da tarefa, executados em ordem, de cima para baixo, nao posso executar
-    # os meus testes sem antes o meu docker estar no ar 
+    # os passos da tarefa, executados em ordem, de cima para baixo
+    # o GitHub sobe o container do banco (services, acima) ANTES de começar estes passos,
+    # então quando o npm run test:e2e rodar, o banco já está no ar
     steps:
       # passo 1: baixa o código do meu repositório para dentro da máquina
       # (a máquina começa vazia, sem nada do meu projeto)
