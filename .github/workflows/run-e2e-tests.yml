@@ -1,0 +1,91 @@
+# workflow dos testes e2e (ponta a ponta): testam a API de verdade, passando pelas rotas,
+# controllers, casos de uso e banco de dados, diferente dos unitários que usam repositórios em memória
+
+# nome do workflow, é o que aparece na aba "Actions" do GitHub
+name: Run E2E Tests
+
+# QUANDO rodar: pull_request = toda vez que eu abrir ou atualizar um pull request
+# (diferente do workflow de unitários, que roda a cada push)
+# branches: [master] = só roda se o PR for PARA a branch master (a branch de destino)
+# um PR para qualquer outra branch não dispara este workflow
+on:
+  pull_request:
+    branches:
+      - master
+
+# lista de tarefas (jobs) que o workflow executa
+jobs:
+  # identificador interno desta tarefa
+  run-e2e-tests:
+    # nome bonito da tarefa, aparece na tela do GitHub
+    name: Run E2E Tests
+    # em QUAL computador rodar: uma máquina virtual com Linux (Ubuntu) emprestada pelo GitHub
+    runs-on: ubuntu-latest
+
+    # env no nível do job = variáveis de ambiente que valem para TODOS os passos abaixo
+    # escrevo uma vez só aqui, em vez de repetir em cada passo
+    # POR QUE ISSO É NECESSÁRIO: o arquivo .env não vai para o GitHub (está no .gitignore),
+    # e o src/env/index.ts lança erro "Invalid environment variables" se estas duas faltarem
+    env:
+      # o JWT_SECRET vem do cofre do GitHub (Settings > Secrets and variables > Actions)
+      # ${{ secrets.NOME }} lê o valor guardado lá, então ele NÃO aparece neste arquivo
+      # e fica escondido (***) nos logs
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      # os testes e2e conectam num banco de verdade, então o valor do secret DATABASE_URL
+      # precisa apontar para o container do postgres criado aqui embaixo, em services
+      # (o endereço é localhost porque o container roda na mesma máquina do job)
+      # o prisma.config.ts também exige essa variável, até para rodar o prisma generate
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    # services = containers extras que ficam rodando junto com o job (aqui, um banco postgres)
+    # os testes e2e precisam de um banco de verdade, e o GitHub não tem um pronto,
+    # então eu peço para ele subir meu docke só para este workflow (nasce no começo e é apagado no fim)
+    services:
+      # nome deste serviço
+      postgres:
+        # qual imagem Docker usar (o mesmo PostgreSQL da Bitnami do meu docker-compose)
+        image: bitnami/postgresql
+        # porta da máquina : porta do container
+        # liga a porta 5432 do container na 5432 da máquina, por isso a URL usa localhost:5432
+        ports:
+          - 5432:5432
+        # usuário, senha e nome do banco que o container vai criar ao nascer, lidos do cofre do GitHub
+        # (a imagem da Bitnami lê exatamente esses nomes de variável para se configurar)
+        # os valores precisam ser IGUAIS aos que estão dentro do secret DATABASE_URL
+        # (formato: postgresql://USUARIO:SENHA@localhost:5432/BANCO?schema=public)
+        # se não baterem, os testes falham com erro de autenticação ou "database does not exist"
+        env:
+          POSTGRESQL_USERNAME: ${{ secrets.POSTGRESQL_USERNAME }}
+          POSTGRESQL_PASSWORD: ${{ secrets.POSTGRESQL_PASSWORD }}
+          POSTGRESQL_DATABASE: ${{ secrets.POSTGRESQL_DATABASE }}
+
+    # os passos da tarefa, executados em ordem, de cima para baixo, nao posso executar
+    # os meus testes sem antes o meu docker estar no ar 
+    steps:
+      # passo 1: baixa o código do meu repositório para dentro da máquina
+      # (a máquina começa vazia, sem nada do meu projeto)
+      - uses: actions/checkout@v3
+
+      # passo 2: instala o Node.js na máquina
+      - uses: actions/setup-node@v3
+        with:
+          # o Prisma 7 só funciona no Node 20.19+, 22.12+ ou 24+ (no 18 o npm ci quebra)
+          # uso a 22 para ficar igual à versão que eu tenho no meu computador
+          node-version: 22
+          # guarda o cache do npm entre execuções, para não baixar tudo de novo
+          cache: 'npm'
+
+      # passo 3: instala as dependências do projeto
+      # npm ci segue exatamente o package-lock.json (mais previsível para automação)
+      - run: npm ci
+
+      # passo 4: gera o Prisma Client, que fica em node_modules e não vem pronto no GitHub
+      # (o node_modules não vai para o GitHub e o npm ci não gera o client sozinho)
+      # sem isso dá o erro "Cannot find module '.prisma/client/default'"
+      - run: npx prisma generate
+
+      # passo 5: roda os testes e2e (o script "test:e2e" do package.json)
+      # o ambiente de teste do prisma (prisma-test-environment.ts) cria um schema novo
+      # dentro do banco e aplica as migrations nele antes de começar,
+      # e apaga esse schema quando os testes terminam
+      - run: npm run test:e2e
