@@ -86,7 +86,6 @@ jobs:
       # (o node_modules não vai para o GitHub e o npm ci não gera o client sozinho)
       # sem isso dá o erro "Cannot find module '.prisma/client/default'"
       - run: npx prisma generate
-
       # passo 5: roda os testes e2e (o script "test:e2e" do package.json)
       # o ambiente de teste do prisma (prisma-test-environment.ts) cria um schema novo
       # dentro do banco e aplica as migrations nele antes de começar,
