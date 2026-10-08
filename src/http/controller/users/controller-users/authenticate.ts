@@ -122,8 +122,11 @@ export async function authenticate(req: FastifyRequest, res: FastifyReply) {
             .status(200)
             .send(
                 {
-                    token, //aqui envio o token de acesso pq ele ixpira mais rapidamente
-                    refreshToken
+                    // aqui envio só o token de acesso pq ele expira mais rapidamente
+                    // o refreshToken NÃO vai no body: ele já vai no cookie httpOnly (setCookie acima),
+                    // que o JavaScript do navegador não consegue ler. Mandar no body também
+                    // desfaria essa proteção
+                    token,
                 }
             )
 

@@ -28,7 +28,29 @@ import { PrismaPg } from "@prisma/adapter-pg";
 // new PrismaPg({...}) cria esse adapter, e "connectionString" é o endereço completo
 // do banco de dados (usuário, senha, host, porta, nome do banco) que ele vai usar
 // pra abrir a conexão. Esse endereço vem de env.DATABASE_URL, que lemos do .env.
-const adapter = new PrismaPg({ connectionString: env.DATABASE_URL })
+//
+// O adapter NÃO entende o "?schema=..." que vem na DATABASE_URL (ele usa o driver "pg",
+// que ignora esse parâmetro e cai sempre no schema "public"). Então eu leio o schema da
+// URL aqui e entrego pro adapter no segundo parâmetro. Isso é essencial nos testes e2e:
+// o prisma-test-environment cria um schema novo (um UUID) e roda as migrations NELE;
+// sem isso a aplicação consultaria o "public", que está vazio, e daria "table does not exist".
+// Se a URL não tiver ?schema=, schema fica undefined e o adapter usa o padrão (public).
+const schema = new URL(env.DATABASE_URL).searchParams.get('schema') ?? undefined
+
+// o tsconfig usa exactOptionalPropertyTypes, então não posso passar "undefined" nas opções:
+// quando não tem schema na URL, eu simplesmente não envio a propriedade (spread condicional)
+const adapter = new PrismaPg(
+    {
+        connectionString: env.DATABASE_URL,
+        // o { schema } do segundo parâmetro só vale para as queries que o Prisma GERA (create, find...).
+        // Já as queries cruas ($queryRaw, como a do findManyNearby, que faz "SELECT * from gyms")
+        // usam o search_path da conexão, que por padrão é o "public".
+        // Aqui eu aponto o search_path da conexão pro mesmo schema, pras duas formas baterem.
+        // As aspas são necessárias porque o schema dos testes é um UUID (tem hífen).
+        ...(schema ? { options: `-c search_path="${schema}"` } : {}),
+    },
+    schema ? { schema } : {},
+)
 
 // Aqui a conexão de verdade é criada e guardada na constante "prisma".
 // "export const" significa que qualquer outro arquivo do projeto pode fazer
