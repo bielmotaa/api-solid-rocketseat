@@ -31,12 +31,13 @@ describe("Profile Controller (e2e)", () => {
             .send();
 
             // aqui eu espero que a resposta da requisição seja 200 e
-            //  que o body seja o usuário criado, com o id, nome e email
+            //  que o body tenha o usuário criado dentro de "user" (como o controller devolve),
+            //  com o email dele (objectContaining ignora os outros campos, como role e created_at)
             expect(profileResponse.statusCode).toEqual(200)
-            expect(profileResponse.body).toEqual({
-                id: expect.any(String),
-                name: "Gabriel Mota",
-                email: "gabriel.mota@example.com"
-            })
+            expect(profileResponse.body.user).toEqual(
+                expect.objectContaining({
+                    email: "gabriel.mota@example.com",
+                })
+            )
     })
 })

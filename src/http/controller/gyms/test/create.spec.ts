@@ -15,11 +15,12 @@ describe("Create Gym (e2e)", () => {
     it("should be able to create a gym", async () => {
         const { token } = await createAndAuthenticateUser(app, true)
 
-        // Aqui faço uma requisição para a rota "/me", que retorna os dados do perfil do usuário.
-        // A requisição precisa do token para que a API saiba quem é o usuário autenticado.
+        // Aqui faço uma requisição POST para a rota "/gyms", que cria uma academia.
+        // (o POST é porque estou criando algo; com GET dava 404, pois não existe GET /gyms)
+        // A requisição precisa do token de um usuário ADMIN para que a API deixe criar.
 
         const response = await request(app.server)
-            .get("/gyms")
+            .post("/gyms")
 
             // Aqui envio o token de autenticação no header da requisição.
             // "Bearer" indica que estamos usando um token do tipo Bearer,
