@@ -42,9 +42,18 @@ jobs:
       # run = rodar um comando no terminal da máquina
       # npm ci é parecido com npm install, mas segue exatamente o package-lock.json
       # (mais seguro e previsível para automação) e evita ficar fazendo perguntas 
-      - run: npm ci 
+      - run: npm ci
 
-      # passo 4: roda os testes (o script "test" do package.json)
+      # passo 4: gera o Prisma Client (o código que o Prisma cria a partir do schema.prisma)
+      # ele fica em node_modules, que não vai para o GitHub, e o npm ci não o gera sozinho
+      # sem isso dá o erro "Cannot find module '.prisma/client/default'"
+      # o prisma.config.ts exige a DATABASE_URL até para gerar, por isso o env aqui
+      # (o generate não conecta no banco, só lê o valor)
+      - run: npx prisma generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      # passo 5: roda os testes (o script "test" do package.json)
       # se algum teste falhar, o passo falha e o GitHub mostra um ❌ no commit
       - run: npm run test
         # env = variáveis de ambiente que existem só durante este passo
