@@ -19,6 +19,14 @@ jobs:
     # em QUAL computador rodar: uma máquina virtual com Linux (Ubuntu) emprestada pelo GitHub
     runs-on: ubuntu-latest
 
+    # env no nível do job = variáveis de ambiente que valem para TODOS os passos abaixo
+    # assim eu escrevo uma vez só, em vez de repetir em cada passo
+    # ${{ secrets.NOME }} lê o valor guardado no cofre do GitHub (Settings > Secrets and variables > Actions)
+    # o valor NÃO aparece neste arquivo e fica escondido (***) nos logs
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     # os passos da tarefa, executados em ordem, de cima para baixo
     steps:
       # passo 1: baixa o código do meu repositório para dentro da máquina
@@ -47,18 +55,11 @@ jobs:
       # passo 4: gera o Prisma Client (o código que o Prisma cria a partir do schema.prisma)
       # ele fica em node_modules, que não vai para o GitHub, e o npm ci não o gera sozinho
       # sem isso dá o erro "Cannot find module '.prisma/client/default'"
-      # o prisma.config.ts exige a DATABASE_URL até para gerar, por isso o env aqui
+      # o prisma.config.ts exige a DATABASE_URL até para gerar (ela vem do env do job, lá em cima)
       # (o generate não conecta no banco, só lê o valor)
       - run: npx prisma generate
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       # passo 5: roda os testes (o script "test" do package.json)
       # se algum teste falhar, o passo falha e o GitHub mostra um ❌ no commit
+      # o src/env/index.ts exige JWT_SECRET e DATABASE_URL (vêm do env do job, lá em cima)
       - run: npm run test
-        # env = variáveis de ambiente que existem só durante este passo
-        # ${{ secrets.NOME }} lê o valor guardado no cofre do GitHub (Settings > Secrets and variables > Actions)
-        # assim o valor NÃO aparece neste arquivo e fica escondido (***) nos logs
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
